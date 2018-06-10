@@ -6,7 +6,7 @@
  * @since: prototipo2.2
  * @source: UsuariosDAO.java 
  * @version: 2.2 - 2018/06/07 
- * @author: Alejandro, Francisco
+ * @author: Alejandro, Francisco, Gonzalo, Alejandro
  */
 
 package accesoDatos.mySql;
@@ -44,7 +44,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	// Requerido por el Singleton. 
 	private static UsuariosDAO instancia = null;
 	private Connection db;
-	
+
 	private Statement sentenciaUsr;
 	private Statement sentenciaId;
 	private ResultSet rsUsuarios;
@@ -80,13 +80,13 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 		return instancia;
 	}
-	
+
 	/**
 	 *  Inicializa el DAO, detecta si existen las tablas de datos capturar
 	 *  excepcion SQLException
 	 *  @throws SQLException
 	 */
-	
+
 	private void inicializar() throws SQLException{
 		bufferObjetos = new ArrayList<Object>();
 		db = Conexion.getDb();
@@ -101,7 +101,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 			crearTablaUsuarios();
 			crearTablaEquivalId();
 		}
-	//Crea el tablemodel y el buffer de objetos para Usuarios.
+		//Crea el tablemodel y el buffer de objetos para Usuarios.
 		tmUsuarios = new DefaultTableModel();
 		bufferObjetos = new ArrayList<Object>();
 	}
@@ -116,20 +116,20 @@ public class UsuariosDAO  implements OperacionesDAO {
 
 		//Creamos la tabla Usuarios
 		s.executeUpdate("CREATE TABLE usuarios ("
-			+ "IdUsr VARCHAR(5) NOT NULL,"
-			+ "NIF VARCHAR(9) NOT NULL,"
-			+ "Nombre VARCHAR(50) NOT NULL,"
-			+ "Apellidos VARCHAR(100) NOT NULL,"
-			+ "Calle VARCHAR(50) NOT NULL,"
-			+ "Numero VARCHAR(5) NOT NULL,"
-			+ "CP INT(5) NOT NULL,"
-			+ "Poblacion VARCHAR(50) NOT NULL,"
-			+ "Correo VARCHAR(100) NOT NULL,"
-			+ "FechaNacimiento DATE NOT NULL,"
-			+ "FechaAlta DATE NOT NULL,"
-			+ "ClaveAcceso VARCHAR(20) NOT NULL,"
-			+ "Rol VARCHAR(20) NOT NULL,"
-			+ "PRIMARY KEY(IdUsr));");
+				+ "IdUsr VARCHAR(5) NOT NULL,"
+				+ "NIF VARCHAR(9) NOT NULL,"
+				+ "Nombre VARCHAR(50) NOT NULL,"
+				+ "Apellidos VARCHAR(100) NOT NULL,"
+				+ "Calle VARCHAR(50) NOT NULL,"
+				+ "Numero VARCHAR(5) NOT NULL,"
+				+ "CP INT(5) NOT NULL,"
+				+ "Poblacion VARCHAR(50) NOT NULL,"
+				+ "Correo VARCHAR(100) NOT NULL,"
+				+ "FechaNacimiento DATE NOT NULL,"
+				+ "FechaAlta DATE NOT NULL,"
+				+ "ClaveAcceso VARCHAR(20) NOT NULL,"
+				+ "Rol VARCHAR(20) NOT NULL,"
+				+ "PRIMARY KEY(IdUsr));");
 	}
 
 	/**
@@ -141,16 +141,16 @@ public class UsuariosDAO  implements OperacionesDAO {
 		Statement s = db.createStatement();
 
 		s.executeUpdate("CREATE TABLE equivalid ("
-			+ "equival VARCHAR(50) NOT NULL,"
-			+ "IdUsr VARCHAR(5) NOT NULL,"
-			+ "PRIMARY KEY(equival));");
+				+ "equival VARCHAR(50) NOT NULL,"
+				+ "IdUsr VARCHAR(5) NOT NULL,"
+				+ "PRIMARY KEY(equival));");
 	}
 	/**
 	 *  Método para generar datos predeterminados.
 	 */
 	private void cargarPredeterminados() throws SQLException, DatosException {
-		
-		
+
+
 		try {
 			String nombreUsr = Configuracion.get().getProperty("usuario.admin");
 			String password = Configuracion.get().getProperty("usuario.passwordPredeterminada");	
@@ -177,8 +177,8 @@ public class UsuariosDAO  implements OperacionesDAO {
 	@Override
 	public void cerrar() {
 		try {
-		sentenciaUsr.close();
-		sentenciaId.close();
+			sentenciaUsr.close();
+			sentenciaId.close();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -247,25 +247,44 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 */
 	@Override
 	public void alta(Object obj) throws DatosException  {
-		assert obj != null;
+
 		Usuario usrNuevo = (Usuario) obj;
-		Usuario usrPrevio = null;
-		try {
-			usrPrevio = obtener(usrNuevo.getIdUsr());
+		Usuario usrPrevio = obtener(usrNuevo.getIdUsr());
+		if(usrPrevio == null){
+			try {
+				almacenar(usrNuevo);
+				registrarEquivalenciaId(usrNuevo);
+
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		catch (DatosException e) {
-			db.store(usrNuevo);
-			registrarEquivalenciaId(usrNuevo);
-			return;
+		else{
+			boolean condicion = !(usrNuevo.getCorreo().equals(usrPrevio.getCorreo())
+					|| usrNuevo.getNif().equals(usrPrevio.getNif()));
+			if(condicion) {
+				int intentos = "ABCDEFGHIJKLMNPQRSTUVWXYZ".length();
+				do {
+					usrNuevo.generarVarianteIdUsr();
+					usrPrevio = obtener(usrNuevo.getIdUsr());
+					if(usrPrevio == null) {
+						try {
+							almacenar(usrNuevo);
+							registrarEquivalenciaId(usrNuevo);
+							return;
+						}
+						catch (SQLException e) {
+							e.printStackTrace();
+						}
+					}
+					intentos--;
+				} while (intentos > 0);
+			}
+			throw new DatosException("(ALTA) El Usuario: "+ usrNuevo.getIdUsr() + " ya existe...");
+
 		}
-		try {
-			generarVarianteIdUsr(usrNuevo, usrPrevio);
-			db.store(usrNuevo);
-			registrarEquivalenciaId(usrNuevo);
-		} 
-		catch (DatosException e) {
-			throw new DatosException("Alta: " + usrNuevo.getIdUsr() + " ya existe y es imposible generar variante.");	
-		}
+
 	}
 
 	/**
