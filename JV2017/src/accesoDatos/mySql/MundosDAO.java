@@ -25,11 +25,11 @@ public class MundosDAO {
 
 
 	/**
-	 * Obtiene un usuario dado su idUsr, el correo o su nif.
-	 * @param id - el id de Usuario a buscar.
-	 * @return - el Usuario encontrado.
-	 * @throws DatosException - si no existe.
-	 */
+     * Obtiene un mundo dado su nombreMundo.
+     * @param nombreMundo - el nombreMundo de Mundo a buscar.
+     * @return - el Mundo encontrado.
+     * @throws DatosException - si no existe.
+     */
 	public Mundo obtener(String nombreMundo) throws DatosException {
 		try {
 			rsMundos = sentenciaMn.executeQuery("SELECT * FROM mundos WHERE nombre = " + nombreMundo + "");
@@ -61,9 +61,23 @@ public class MundosDAO {
 		
 	}
 
-
+	/**
+     * Rellena las filas del table-model
+     */
+	
 	private void rellenaFilasModelo() {
-		// TODO Auto-generated method stub
+		Object[] datosFila = new Object[tmMundos.getColumnCount()];
+
+        try{
+            while (rsMundos.next()){
+                for (int i=0;i< tmMundos.getColumnCount();i++){
+                    datosFila[i] = rsMundos.getObject(i+1);
+                }
+                ((DefaultTableModel) tmMundos).addRow(datosFila);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 		
 	}
 
