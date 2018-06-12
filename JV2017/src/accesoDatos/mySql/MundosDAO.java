@@ -87,10 +87,24 @@ public class MundosDAO {
 		
 	}
 
-
+	// Crea las columnas del tableModel
 	private void estableceColumnasModelo() {
 		// TODO Auto-generated method stub
-		
+		try {
+			ResultSetMetaData metaDatos = rsMundos.getMetaData();
+
+			int numCol = metaDatos.getColumnCount();
+
+			Object[] etiquetas = new Object[numCol];
+			for (int i=0; i< numCol; i++){
+				etiquetas[i] = metaDatos.getColumnLabel(i +1);
+			}
+			((DefaultTableModel)tmMundos).setColumnIdentifiers(etiquetas); 
+
+		}catch (SQLException e){
+
+			e.printStackTrace();
+		}
 	}
 
 }
