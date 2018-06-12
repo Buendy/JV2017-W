@@ -286,7 +286,8 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 
 	}
-
+	
+		
 	/**
 	 * Genera variante de IdUsr cuando se produce coincidencia de identificador 
 	 * con un usuario ya almacenado. 
@@ -374,11 +375,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 */
 	@Override
 	public String listarDatos() {
-		StringBuilder listado = new StringBuilder();
-		for (Usuario usr: obtenerTodos()) {
-			listado.append("\n" + usr);
-		}
-		return listado.toString();
+		return obtenerTodos().toString();
 	}
 
 	/**
@@ -419,7 +416,15 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 * @return - El idUsr equivalente.
 	 */
 	public String obtenerEquivalencia(String id) {
-		return obtenerMapaEquivalencias().get(id);
+		try {
+			ResultSet rsEquival = sentenciaUsr.executeQuery("SELECT * FROM equivalid WHERE equival ="+ id + "");
+			if (rsEquival.next()){
+				return (String) rsEquival.getObject(2);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
