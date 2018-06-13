@@ -438,6 +438,34 @@ public class UsuariosDAO  implements OperacionesDAO {
 		ObjectSet <Hashtable <String,String>> result = consulta.execute();
 		return result.get(0);	
 	}
+	/**
+	 * Almacena usuario en la base de datos.
+	 * @param usr, el objeto a procesar
+	 * @throws SQLException
+	 * @throws Datos Exception
+	 */
+
+	private void almacenar(Usuario usr) throws SQLException {
+		ResultSet rsUsr = null;
+		//Consulta y los resultados quedane en el ResultSet
+		rsUsr = sentenciaUsr.executeQuery("SELECT * FROM usuarios");
+		rsUsr.moveToInsertRow();
+		rsUsr.updateString("idUsr", usr.getIdUsr());
+		rsUsr.updateString("nif", usr.getNif().toString());	
+		rsUsr.updateString("nombre", usr.getNombre());
+		rsUsr.updateString("apellidos", usr.getApellidos());
+		rsUsr.updateString("calle", usr.getDomicilio().getCalle().toString());
+		rsUsr.updateString("numero", usr.getDomicilio().getNumero().toString());
+		rsUsr.updateString("cp", usr.getDomicilio().getCp().toString());
+		rsUsr.updateString("poblacion", usr.getDomicilio().getPoblacion().toString());
+		rsUsr.updateString("correo", usr.getCorreo().toString());
+		rsUsr.updateDate("fechaNacimiento", new java.sql.Date(usr.getFechaNacimiento().toDate().getTime()));
+		rsUsr.updateDate("fechaAlta", new java.sql.Date(usr.getFechaAlta().toDate().getTime()));
+		rsUsr.updateString("claveAcceso", usr.getClaveAcceso().toString());
+		rsUsr.updateString("rol", usr.getRol().toString());
+		rsUsr.insertRow();
+		rsUsr.beforeFirst();
+		}
 
 	/**
 	 * Registra las equivalencias de nif y correo para un idUsr.
