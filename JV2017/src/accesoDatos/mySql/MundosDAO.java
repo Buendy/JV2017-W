@@ -50,7 +50,7 @@ public class MundosDAO {
 			}
 		}
 		catch (SQLException e) {
-			throw new DatosException("(OBTENER) El mundo: " + nombreMundo + "no exite.");
+			throw new DatosException("(OBTENER) El mundo: " + nombreMundo + "no existe.");
 		}
 		return null;
 	}
@@ -105,6 +105,16 @@ public class MundosDAO {
 
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+     * Borrar un mundo dado un objeto mundo.
+     * @param mundo - el objeto de Mundo a borrar.
+     * @throws DatosException - si no existe.
+     */
+	private void borrar(Mundo mundo)throws SQLException{
+		bufferObjetos.remove(mundo);
+		sentenciaNombre.execute("DELETE FROM mundos where nombre=" + mundo.getNombre() + ";");
 	}
 
 }
