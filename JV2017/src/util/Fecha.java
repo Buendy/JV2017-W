@@ -39,7 +39,13 @@ public class Fecha implements Serializable {
 	public Fecha(Fecha fecha) {
 		this(fecha.getAño(), fecha.getMes(), fecha.getDia());
 	}
+	
+	public Fecha(Date fecha) {
+		calendario = new GregorianCalendar();
+		calendario.setTime(fecha);
+		}
 
+	
 	public int getAño() {
 		return calendario.get(Calendar.YEAR);
 	}
