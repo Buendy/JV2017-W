@@ -13,6 +13,7 @@ package accesoDatos.mySql;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -80,7 +81,6 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 		return instancia;
 	}
-
 	/**
 	 *  Inicializa el DAO, detecta si existen las tablas de datos capturar
 	 *  excepcion SQLException
@@ -195,14 +195,15 @@ public class UsuariosDAO  implements OperacionesDAO {
 	@Override
 	public Usuario obtener(String id) throws DatosException {
 		try {
+			// AQUÍ
 			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + idUsr + "");
-			//Establece columnas de filas.
+			//Establece columnas de filas. HACER
 			estableceColumnasModelo();
 
 			//Borrado previo de filas
 			borraFilasModelo();
 
-			//Volcado desde el resulSet
+			//Volcado desde el resulSet HACER
 			rellenaFilasModelo();
 
 			//Actualiza buffer de objetos.
@@ -438,6 +439,34 @@ public class UsuariosDAO  implements OperacionesDAO {
 	}
 
 	/**
+	 * Crea las columnas del TableModel a partir de los metadatos del ResulSet
+	 * una consulta a base de datos. ROCIO
+	 */
+	private void estableceColumnasModelo() {
+		try {
+			// Obtiene metadatos
+			ResultSetMetaData metaDatos = rsUsuarios.getMetaData();
+			
+			// Número total de columnas
+			int numCol = metaDatos.getColumnCount();
+			
+			// Etiqueta de cada columna
+			Object[] etiquetas = new Object[numCol];
+			for (int i = 0; i < numCol; i++) {
+				etiquetas[i] = metaDatos.getColumnLabel(i + 1);
+			}
+			// Incorpora array de etiquetas en el TableModel
+			((DefaultTableModel) tmUsuarios).setColumnIdentifiers(etiquetas);
+		   } catch (SQLException e)	{
+			   e.printStackTrace();
+		}
+	}
+	/**
+	 * 
+	 */
+	
+
+	/**
 	 * Obtiene el mapa de equivalencias de id para idUsr.
 	 * @return el Hashtable almacenado.
 	 */
@@ -454,7 +483,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 * @throws SQLException
 	 * @throws Datos Exception
 	 */
-
+	
 	private void almacenar(Usuario usr) throws SQLException {
 		ResultSet rsUsr = null;
 		//Consulta y los resultados quedane en el ResultSet
