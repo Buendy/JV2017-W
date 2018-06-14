@@ -457,10 +457,15 @@ public class UsuariosDAO  implements OperacionesDAO {
 			}
 			// Incorpora array de etiquetas en el TableModel
 			((DefaultTableModel) tmUsuarios).setColumnIdentifiers(etiquetas);
-		   } catch (SQLExcepyion e)	{
+		   } catch (SQLException e)	{
 			   e.printStackTrace();
 		}
 	}
+	/**
+	 * 
+	 */
+	
+
 	/**
 	 * Obtiene el mapa de equivalencias de id para idUsr.
 	 * @return el Hashtable almacenado.
