@@ -480,16 +480,28 @@ public class UsuariosDAO  implements OperacionesDAO {
 	/**
 	 * Registra las equivalencias de nif y correo para un idUsr.
 	 * @param usuario
+	 * @throws SQLException
 	 */
-	private void registrarEquivalenciaId(Usuario usuario) {
-		//Obtiene mapa de equivalencias
-		Map<String,String> mapaEquivalencias = obtenerMapaEquivalencias();
-		//Registra equivalencias 
-		mapaEquivalencias.put(usuario.getIdUsr(), usuario.getIdUsr());
-		mapaEquivalencias.put(usuario.getNif().getTexto(), usuario.getIdUsr());
-		mapaEquivalencias.put(usuario.getCorreo().getTexto(), usuario.getIdUsr());
-		//actualiza datos
-		db.store(mapaEquivalencias);	
+	private void registrarEquivalenciaId(Usuario usr) throws SQLException {
+		ResultSet rsEquival = null;
+		
+		rsEquival = sentenciaId.executeQuery("SELECT * FROM equivalid");
+		rsEquival.moveToInsertRow();
+		rsEquival.updateString("equival", usr.getIdUsr());
+		rsEquival.updateString("idUsr", usr.getIdUsr().toString());
+		rsEquival.insertRow();
+		rsEquival.beforeFirst();
+		rsEquival.moveToInsertRow();
+		rsEquival.updateString("equival", usr.getNif().toString());
+		rsEquival.updateString("idUsr", usr.getIdUsr().toString());
+		rsEquival.insertRow();
+		rsEquival.beforeFirst();
+		rsEquival.moveToInsertRow();
+		rsEquival.updateString("equival", usr.getCorreo().toString());
+		rsEquival.updateString("idUsr", usr.getIdUsr().toString());
+		rsEquival.insertRow();
+		rsEquival.beforeFirst();
+
 	}
 
 	/**
