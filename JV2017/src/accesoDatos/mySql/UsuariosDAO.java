@@ -197,13 +197,13 @@ public class UsuariosDAO  implements OperacionesDAO {
 		try {
 			// AQUÍ
 			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + idUsr + "");
-			//Establece columnas de filas. HACER
+			//Establece columnas de filas. 
 			estableceColumnasModelo();
 
 			//Borrado previo de filas
 			borraFilasModelo();
 
-			//Volcado desde el resulSet HACER
+			//Volcado desde el resulSet 
 			rellenaFilasModelo();
 
 			//Actualiza buffer de objetos.
@@ -440,7 +440,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 
 	/**
 	 * Crea las columnas del TableModel a partir de los metadatos del ResulSet
-	 * una consulta a base de datos. ROCIO
+	 * una consulta a base de datos.
 	 */
 	private void estableceColumnasModelo() {
 		try {
@@ -462,9 +462,24 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 	}
 	/**
-	 * 
+	 * Replica en el TableModel las filas del ResultSet
 	 */
-	
+	private void rellenarFilasModelo() {
+		Object[] datosFila = new Object[tmUsuarios.getColumnCount()];
+		// Para cada fila en ResulSet de la consulta
+		try {
+			while (rsUsuarios.next()) {
+				// Se replica y añade la fila en el TableModel.
+				for(int i = 0; i < tmUsuarios.getColumnCount(); i++) {
+					datosFila[i] = rsUsuarios.getObject(i + 1);
+				}
+				((DefaultTableModel) tmUsuarios).addRow(datosFila);
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		
+	}
 
 	/**
 	 * Obtiene el mapa de equivalencias de id para idUsr.
