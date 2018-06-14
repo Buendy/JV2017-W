@@ -6,7 +6,7 @@
  * @since: prototipo2.2
  * @source: UsuariosDAO.java 
  * @version: 2.2 - 2018/06/07 
- * @author: Alejandro, Francisco, Gonzalo, Alejandro
+ * @author: Francisco, Gonzalo, Alejandro
  */
 
 package accesoDatos.mySql;
@@ -116,7 +116,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 
 		//Creamos la tabla Usuarios
 		s.executeUpdate("CREATE TABLE usuarios ("
-				+ "IdUsr VARCHAR(5) NOT NULL,"
+				+ "idUsr VARCHAR(5) NOT NULL,"
 				+ "NIF VARCHAR(9) NOT NULL,"
 				+ "Nombre VARCHAR(50) NOT NULL,"
 				+ "Apellidos VARCHAR(100) NOT NULL,"
@@ -195,7 +195,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	@Override
 	public Usuario obtener(String id) throws DatosException {
 		try {
-			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + IdUsr + "");
+			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + idUsr + "");
 			//Establece columnas de filas.
 			estableceColumnasModelo();
 
@@ -212,7 +212,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 			}
 		}
 		catch (SQLException e) {
-			thows new DatosException("(OBTENER) El usuario: " + IdUsr + "no exite.");
+			thows new DatosException("(OBTENER) El usuario: " + idUsr + "no exite.");
 		}
 		return null;
 	}
@@ -286,8 +286,8 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 
 	}
-	
-		
+
+
 	/**
 	 * Genera variante de IdUsr cuando se produce coincidencia de identificador 
 	 * con un usuario ya almacenado. 
@@ -322,20 +322,30 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 * @throws DatosException - si no existe.
 	 */
 	@Override
-	public Object baja(String id) throws DatosException {
-		assert id != null;
-		assert id != "";
-		assert id != " ";
-		try {
-			Usuario usr = obtener(id);
-			borrarEquivalenciaId(usr);
-			db.delete(usr);
-			return usr;
+	public Object baja(String idUsr) throws DatosException {
+		Usuario usr = obtener(idUsr);
+		if(usr != null) {
+			try {
+				borrarEquivalenciaId(usr.getIdUsr());
+				borrar(usr);
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		catch (DatosException e) {
-			throw new DatosException("Baja: "+ id + " no existe.");
+		else {
+			throw new DatosException("Baja: "+ idUsr + " no existe.");
 		}
-	} 
+		return usr; 
+	}
+
+
+
+
+	private void borrar(Usuario usr) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/**
 	 *  Actualiza datos de un Usuario reemplazando el almacenado por el recibido. 
@@ -456,15 +466,15 @@ public class UsuariosDAO  implements OperacionesDAO {
 
 	/**
 	 * Elimina las equivalencias de nif y correo para un idUsr.
-	 * @param usuario - el usuario para eliminar sus equivalencias de idUsr.
+	 * @param string - el usuario para eliminar sus equivalencias de idUsr.
 	 */
-	private void borrarEquivalenciaId(Usuario usuario) {
+	private void borrarEquivalenciaId(String string) {
 		//Obtiene mapa de equivalencias
 		Map<String,String> mapaEquivalencias = obtenerMapaEquivalencias();
 		//Borra equivalencias 
-		mapaEquivalencias.remove(usuario.getIdUsr());
-		mapaEquivalencias.remove(usuario.getNif().getTexto());
-		mapaEquivalencias.remove(usuario.getCorreo().getTexto());
+		mapaEquivalencias.remove(string.getIdUsr());
+		mapaEquivalencias.remove(string.getNif().getTexto());
+		mapaEquivalencias.remove(string.getCorreo().getTexto());
 		//actualiza datos
 		db.store(mapaEquivalencias);	
 	}
