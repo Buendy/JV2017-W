@@ -339,8 +339,15 @@ public class UsuariosDAO  implements OperacionesDAO {
 		}
 		return usr; 
 	}
-
-
+	
+	/**
+	* Borra las filas del TableModel
+	* @param tm - El TableModel a vaciar
+	*/
+	private void borraFilasModelo(){
+		while(tmUsuarios.getRowCount() > 0)
+			((DefaultTableModel) tmUsuarios).removeRow(0);
+	}
 
 
 	private void borrar(Usuario usr) {
