@@ -195,7 +195,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	@Override
 	public Usuario obtener(String id) throws DatosException {
 		try {
-			// AQUÍ
+			// AQUï¿½
 			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + idUsr + "");
 			//Establece columnas de filas. 
 			estableceColumnasModelo();
@@ -207,16 +207,58 @@ public class UsuariosDAO  implements OperacionesDAO {
 			rellenaFilasModelo();
 
 			//Actualiza buffer de objetos.
-			sincronizaBufferObjetos();
+			sincronizarBufferObjetos();
 			if (bufferObjetos.size() > 0) {
 				return(Usuario) bufferObjetos.get(0);
 			}
 		}
 		catch (SQLException e) {
-			thows new DatosException("(OBTENER) El usuario: " + idUsr + "no exite.");
+			throw new DatosException("(OBTENER) El usuario: " + idUsr + "no exite.");
 		}
 		return null;
 	}
+	/**
+	 * Regenera lista de los objetos procesanco el tableModel.
+	 * @throws SQLException
+	 */
+	private void sincronizarBufferObjetos() throws SQLException {
+		bufferObjetos.clear();
+		for(int i = 0; i < tmUsuarios.getRowCount(); i++) {
+			try {
+				Nif nif = new Nif((String) tmUsuarios.getValueAt(i, 1));
+				String nombre = (String) tmUsuarios.getValueAt(i, 2);
+				String apellidos =(String) tmUsuarios.getValueAt(i, 3);
+				DireccionPostal domicilio = new DireccionPostal((String) tmUsuarios.getValueAt(i, 4),
+						(String) tmUsuarios.getValueAt(i, 5),
+						(String) tmUsuarios.getValueAt(i, 6),
+						(String) tmUsuarios.getValueAt(i, 7));
+				Correo correo = new Correo((String) tmUsuarios.getValueAt(i, 8));
+				Fecha fechaNacimiento = new Fecha((java.sql.Date) tmUsuarios.getValueAt(i, 9));
+				Fecha fechaAlta = new Fecha((java.sql.Date) tmUsuarios.getValueAt(i, 10));
+				ClaveAcceso claveAcceso = new ClaveAcceso((String) tmUsuarios.getValueAt(i, 11));
+				RolUsuario rol = null;
+				switch ((String) tmUsuarios.getValueAt(i, 12)) {
+				case "INVITADO":
+					rol = RolUsuario.INVITADO;
+					break;
+				case "NORMAL":
+					rol = RolUsuario.NORMAL;
+					break;
+				case "ADMINISTRADOR":
+					rol = RolUsuario.ADMINISTRADOR;
+					break;
+				}
+				// Genera y guarda objeto
+				bufferObjetos.add(new Usuario(nif,nombre,apellidos,domicilio,correo,
+						fechaNacimiento,fechaAlta,claveAcceso,rol));
+			}
+			catch (ModeloException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
 
 
 	/**
@@ -454,7 +496,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 			// Obtiene metadatos
 			ResultSetMetaData metaDatos = rsUsuarios.getMetaData();
 			
-			// Número total de columnas
+			// Nï¿½mero total de columnas
 			int numCol = metaDatos.getColumnCount();
 			
 			// Etiqueta de cada columna
@@ -476,7 +518,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 		// Para cada fila en ResulSet de la consulta
 		try {
 			while (rsUsuarios.next()) {
-				// Se replica y añade la fila en el TableModel.
+				// Se replica y aï¿½ade la fila en el TableModel.
 				for(int i = 0; i < tmUsuarios.getColumnCount(); i++) {
 					datosFila[i] = rsUsuarios.getObject(i + 1);
 				}
