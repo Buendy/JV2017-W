@@ -82,10 +82,13 @@ public class MundosDAO {
 	}
 
 
+	/**
+	 * Borra las filas del table-model
+	 */
 	private void borraFilasModelo() {
-		// TODO Auto-generated method stub
-		
-	}
+		while (tmMundos.getRowCount() > 0)
+			((DefaultTableModel)tmMundos).removeRow(0);;
+	} 
 
 	// Crea las columnas del tableModel
 	private void estableceColumnasModelo() {
