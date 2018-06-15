@@ -149,7 +149,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 *  MÃ©todo para generar datos predeterminados.
 	 */
 	private void cargarPredeterminados() throws SQLException, DatosException {
-	try {
+		try {
 			String nombreUsr = Configuracion.get().getProperty("usuario.admin");
 			String password = Configuracion.get().getProperty("usuario.passwordPredeterminada");	
 			Usuario usrPredeterminado = new Usuario(new Nif("00000000T"), nombreUsr, "Admin Admin", 
@@ -193,7 +193,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	@Override
 	public Usuario obtener(String id) throws DatosException {
 		try {
-			// AQUÍ
+			// AQUï¿½
 			rsUsuarios = sentenciaUsr.executeQuery("SELECT * FROM usuarios WHERE IdUsr = " + idUsr + "");
 			//Establece columnas de filas. 
 			estableceColumnasModelo();
@@ -202,7 +202,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 			borraFilasModelo();
 
 			//Volcado desde el resulSet 
-			rellenaFilasModelo();
+			rellenarFilasModelo();
 
 			//Actualiza buffer de objetos.
 			sincronizaBufferObjetos();
@@ -217,15 +217,35 @@ public class UsuariosDAO  implements OperacionesDAO {
 	}
 
 
+	private void borraFilasModelo() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * Obtiene todos los usuarios almacenados.
-	 * @return - la List con todos los usuarios.
+	 * @throws SQLException.
 	 */
 	@Override
-	public List <Usuario> obtenerTodos() {
-		Query consulta = db.query();
-		consulta.constrain(Usuario.class);
-		return consulta.execute();
+	public ArrayList<Object> obtenerTodos() {
+		java.sql.Statement sentencia;
+		try {
+			sentencia = db.createStatement();
+			rsUsuarios = sentencia.executeQuery("SELECT * FROM usuarios");
+			
+			this.estableceColumnasModelo();
+			this.borraFilasModelo();
+			this.rellenarFilasModelo();
+			sincronizaBufferObjetos();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return (ArrayList<Object>) bufferObjetos;
+	}
+
+	private void sincronizaBufferObjetos() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -436,10 +456,10 @@ public class UsuariosDAO  implements OperacionesDAO {
 		try {
 			// Obtiene metadatos
 			ResultSetMetaData metaDatos = rsUsuarios.getMetaData();
-			
-			// Número total de columnas
+
+			// Nï¿½mero total de columnas
 			int numCol = metaDatos.getColumnCount();
-			
+
 			// Etiqueta de cada columna
 			Object[] etiquetas = new Object[numCol];
 			for (int i = 0; i < numCol; i++) {
@@ -447,8 +467,8 @@ public class UsuariosDAO  implements OperacionesDAO {
 			}
 			// Incorpora array de etiquetas en el TableModel
 			((DefaultTableModel) tmUsuarios).setColumnIdentifiers(etiquetas);
-		   } catch (SQLException e)	{
-			   e.printStackTrace();
+		} catch (SQLException e)	{
+			e.printStackTrace();
 		}
 	}
 	/**
@@ -459,7 +479,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 		// Para cada fila en ResulSet de la consulta
 		try {
 			while (rsUsuarios.next()) {
-				// Se replica y añade la fila en el TableModel.
+				// Se replica y aï¿½ade la fila en el TableModel.
 				for(int i = 0; i < tmUsuarios.getColumnCount(); i++) {
 					datosFila[i] = rsUsuarios.getObject(i + 1);
 				}
@@ -468,7 +488,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -488,7 +508,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 * @throws SQLException
 	 * @throws Datos Exception
 	 */
-	
+
 	private void almacenar(Usuario usr) throws SQLException {
 		ResultSet rsUsr = null;
 		//Consulta y los resultados quedane en el ResultSet
@@ -509,7 +529,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 		rsUsr.updateString("rol", usr.getRol().toString());
 		rsUsr.insertRow();
 		rsUsr.beforeFirst();
-		}
+	}
 
 	/**
 	 * Registra las equivalencias de nif y correo para un idUsr.
@@ -518,7 +538,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 */
 	private void registrarEquivalenciaId(Usuario usr) throws SQLException {
 		ResultSet rsEquival = null;
-		
+
 		rsEquival = sentenciaId.executeQuery("SELECT * FROM equivalid");
 		rsEquival.moveToInsertRow();
 		rsEquival.updateString("equival", usr.getIdUsr());
